@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambulance Booking</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Inline Styles -->
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: url('assets/ambulance-bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        .booking-container {
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            margin-top: 10%;
+        }
+
+        input {
+            width: calc(100% - 80px);
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #useLocation {
+            width: auto;
+            padding: 10px 15px;
+            margin-left: 5px;
+            display: inline-block;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Booking Form Container -->
+    <div class="booking-container">
+        <h2>Book an Ambulance</h2>
+        <form id="bookingForm">
+            <!-- Location Input Section -->
+            <div>
+                <label for="location">Enter Your Location:</label>
+                <input type="text" id="location" placeholder="e.g., 123 Main Street, City" required>
+                <button type="button" id="useLocation">📍</button>
+            </div>
+            <!-- Phone Number Input Section -->
+            <div>
+                <label for="phoneNumber">Enter Your Phone Number:</label>
+                <input type="tel" id="phoneNumber" placeholder="e.g., +1234567890" required>
+            </div>
+            <button type="submit" class="btn-primary">Submit</button>
+        </form>
+        <p id="statusMessage"></p>
+    </div>
+
+    <!-- Location and Form Handling Scripts -->
+    <script>
+        // DOM Elements
+        const useLocationButton = document.getElementById("useLocation");
+        const locationInput = document.getElementById("location");
+        const statusMessage = document.getElementById("statusMessage");
+
+        // Geolocation Handler
+        useLocationButton.addEventListener("click", () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+
+                        // Reverse Geocoding using OpenStreetMap's Nominatim API
+                        const geocodeUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
+
+                        fetch(geocodeUrl)
+                            .then((response) => response.json())
+                            .then((data) => {
+                                if (data.address) {
+                                    locationInput.value = data.display_name;
+                                    statusMessage.textContent = "Location fetched successfully!";
+                                } else {
+                                    statusMessage.textContent = "Unable to fetch address.";
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("Error fetching address:", error);
+                                statusMessage.textContent = "Error fetching address.";
+                            });
+                    },
+                    (error) => {
+                        console.error("Error getting location:", error);
+                        statusMessage.textContent = "Error getting location.";
+                    }
+                );
+            } else {
+                statusMessage.textContent = "Geolocation is not supported by your browser.";
+            }
+        });
+
+        // Form Submission Handler
+        document.getElementById("bookingForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const location = locationInput.value.trim();
+            const phoneNumber = document.getElementById("phoneNumber").value.trim();
+
+            // Form Validation
+            if (!location) {
+                statusMessage.textContent = "Please enter your location.";
+                return;
+            }
+
+            if (!phoneNumber) {
+                statusMessage.textContent = "Please enter your phone number.";
+                return;
+            }
+
+            // Store Data and Redirect
+            localStorage.setItem("location", location);
+            localStorage.setItem("phoneNumber", phoneNumber);
+            window.location.href = "results.html";
+        });
+    </script>
+</body>
+</html>

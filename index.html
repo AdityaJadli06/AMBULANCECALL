@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambulance Booking</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Background Section -->
+    <div class="background-section">
+        <h2>Welcome to Ambulance Booking 🚑</h2>
+        
+        <!-- Auth Section: Sign in/up options -->
+        <div id="authSection">
+            <button id="googleSignIn" class="btn-primary" onclick="location.href='google-login.html'">Sign in with Google</button>
+            <button id="emailSignIn" class="btn-primary" onclick="location.href='email-signin.html'">Sign in with Email</button>
+            <button id="emailSignUp" class="btn-secondary" onclick="location.href='email-signup.html'">Sign up with Email</button>
+        </div>
+
+        <!-- Welcome Section: Shows after authentication -->
+        <div id="welcomeSection" style="display: none;">
+            <h3>Welcome, <span id="userName"></span></h3>
+            <button id="signOut" class="btn-secondary">Sign out</button>
+        </div>
+
+        <!-- Booking Section: Main functionality -->
+        <div id="bookingSection" style="display: none;">
+            <h3>Book an Ambulance</h3>
+            <button class="btn-primary" id="bookButton" onclick="location.href='booking.html'">Go to Book Ambulance</button>
+        </div>
+    </div>
+
+    <!-- Firebase Integration -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="firebaseConfig.js"></script>
+
+    <!-- Authentication Logic -->
+    <script>
+        // Monitor authentication state changes
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                console.log("User is logged in:", user);
+                document.getElementById("authSection").style.display = "none";
+                document.getElementById("welcomeSection").style.display = "block";
+                document.getElementById("bookingSection").style.display = "block";
+                document.getElementById("userName").textContent = user.displayName || user.email || "User";
+            } else {
+                console.log("No user is logged in.");
+                document.getElementById("authSection").style.display = "block";
+                document.getElementById("welcomeSection").style.display = "none";
+                document.getElementById("bookingSection").style.display = "none";
+            }
+        });
+
+        // Handle sign out functionality
+        const signOutBtn = document.getElementById("signOut");
+        if (signOutBtn) {
+            signOutBtn.addEventListener("click", () => {
+                firebase.auth().signOut()
+                    .then(() => {
+                        console.log("User signed out successfully.");
+                        document.getElementById("authSection").style.display = "block";
+                        document.getElementById("welcomeSection").style.display = "none";
+                        document.getElementById("bookingSection").style.display = "none";
+                    })
+                    .catch((error) => {
+                        console.error("Error signing out:", error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
