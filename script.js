@@ -1,3 +1,20 @@
+function handlePopupBlocking() {
+    window.addEventListener('load', function() {
+        // Test if popups are blocked
+        const popupTest = window.open('about:blank', '_blank');
+        if (!popupTest || popupTest.closed || typeof popupTest.closed=='undefined') {
+            alert('Please enable popups for this site to work properly');
+            // Add a visible warning
+            const warning = document.createElement('div');
+            warning.innerHTML = `
+                <div style="background: #ff5733; color: white; padding: 10px; text-align: center;">
+                    ⚠️ Please enable popups for full functionality
+                </div>`;
+            document.body.insertBefore(warning, document.body.firstChild);
+        }
+        if (popupTest) popupTest.close();
+    });
+}
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("bookingForm");
 
@@ -56,6 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 });
+handlePopupBlocking();
 
 function bookAmbulance(name) {
     alert(`✅ ${name} has been booked! Ambulance is on the way.`);
